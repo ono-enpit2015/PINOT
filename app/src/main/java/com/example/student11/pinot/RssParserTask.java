@@ -123,14 +123,14 @@ public class RssParserTask extends AsyncTask<String, Integer, RssListAdapter> {
         try {		//XMLパーサー解析開始
             parser.setInput(is, null);						//XMLのストリームを渡す
             int eventType = parser.getEventType();			//今読み込んでいる場所がどの状態かを知る
-            ClipData.Item currentItem = null;
+            Item currentItem = null;
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 String tag = null;
                 switch (eventType) {
                     case XmlPullParser.START_TAG:
                         tag = parser.getName();				//XMLのタグ名称を取得する
                         if (tag.equals("item")) {
-                            currentItem = new ClipData.Item();
+                            currentItem = new Item("");
                         } else if (currentItem != null) {
                             if (tag.equals("title")) {
                                 title = parser.nextText();

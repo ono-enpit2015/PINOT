@@ -7,7 +7,8 @@ import android.text.SpannableString;
 import android.text.TextWatcher;
 
 import net.reduls.sanmoku.Tagger;
-import net.reduls.sanmoku.dic.Morpheme;
+//import net.reduls.sanmoku.dic.Morpheme;
+import net.reduls.sanmoku.Morpheme;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

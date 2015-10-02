@@ -26,8 +26,8 @@ import java.util.StringTokenizer;
 //ListViewオブジェクトを既に含んだListActivityを使っているので,新たにListViewのインスタンスを生成して、アクティビティにセットする必要がない
 //setAdapter() ではなく setListAdapter() を使う
 public class RssReaderActivity extends ListActivity {
-    private static final String RSS_FEED_URL =  "http://www.rssmix.com/u/7592172/rss.xml"; //http://www.rssmix.com/u/6589813/rss.xml
-    private ArrayList<ClipData.Item> mItems;
+    private static final String RSS_FEED_URL =  "http://www.rssmix.com/u/6589813/rss.xml"; //http://www.rssmix.com/u/6589813/rss.xml
+    private ArrayList<Item> mItems;
     private RssListAdapter mAdapter;
     long start;
     long stop;
@@ -50,7 +50,7 @@ public class RssReaderActivity extends ListActivity {
         setContentView(R.layout.activity_main);
 
         // Itemオブジェクトを保持するためのリストを生成し、アダプタに追加する
-        mItems = new ArrayList<ClipData.Item>();
+        mItems = new ArrayList<Item>();
         mAdapter = new RssListAdapter(this, mItems);
 
         // タスクを起動する
@@ -62,7 +62,7 @@ public class RssReaderActivity extends ListActivity {
     // リストの項目を選択した時の処理
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        ClipData.Item item = (ClipData.Item) mItems.get(position);
+        Item item = mItems.get(position);
         Intent intent = new Intent(this, ItemDetailActivity.class);
 
         intent.putExtra("TITLE", item.getTitle());

@@ -1,11 +1,13 @@
 package com.example.student11.pinot;
 
+import android.content.ClipData;
+
 /**
  * Created by student11 on 2015/09/25.
  */
 //「Item.java」ファイルは、記事タイトルや、記事概要を格納するクラスで、
 //前回修正した「item_row.xml（レイアウトファイル）」との関連も強いです。
-public class Item {
+public class Item extends ClipData.Item {
     // 記事のタイトル
     private CharSequence mTitle;
     // 記事の更新日
@@ -13,7 +15,14 @@ public class Item {
     // 記事のリンク
     private CharSequence mLink;
 
-    public Item() {
+    /*public Item() {
+        mTitle = "";
+        mDate = "";
+        mLink = "";
+    }*/
+
+    public Item(CharSequence text) {
+        super(text);
         mTitle = "";
         mDate = "";
         mLink = "";
