@@ -1,11 +1,19 @@
 package com.example.student11.pinot;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
+import android.view.Display;
 import android.view.KeyEvent;
+import android.view.View;
+import android.view.Window;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -25,20 +33,8 @@ import java.util.StringTokenizer;
  */
 public class ItemDetailActivity extends Activity {
     private TextView mTitle;
-    //private TextView mDescr;
-    //private TextView mDate;
-    //private WebView mWeb;
-    //private TextView mDetailtext;
     public static long start = 0;
-    final String LOGDIR = Environment.getExternalStorageDirectory().getPath()+"/data/";
-    final String SDFILE3 = LOGDIR + "title_info.txt";
-    final String SDFILE4 = LOGDIR + "title_info_new.txt";
-    File Title = new File(SDFILE3);
-    File Title_w = new File(SDFILE4);
-    private String line;		//title_info.txtの先頭から１行ずつ取ってきたものを格納
-    private int count;			//count=-1ならば既読、０以上なら未読で見たと判断した回数を表示
-    private int count_line;
-    private String title_line;
+    String crlf = System.getProperty("line.separator");
 
     public void onCreate(Bundle savedInstanceState) {
 
@@ -46,7 +42,6 @@ public class ItemDetailActivity extends Activity {
         setContentView(R.layout.item_detail);
 
         Intent intent = getIntent();
-        PINOT_FILTER P = new PINOT_FILTER();
 		/*String link = intent.getStringExtra("LINK");
         mWeb = (WebView)findViewById(R.id.item_detail_web);
         mWeb.loadUrl(link);*/
@@ -54,7 +49,10 @@ public class ItemDetailActivity extends Activity {
         mTitle = (TextView) findViewById(R.id.item_detail_title);
         mTitle.setText(title);
 
-        P.Pinot_Filter(title,3);
+        RssReaderActivity.progressDialog.dismiss();
+
+        //PINOT_FILTER P = new PINOT_FILTER();
+        //P.Pinot_Filter(title,3);        // ユーザプロファイルの更新
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -63,6 +61,7 @@ public class ItemDetailActivity extends Activity {
         try {
 
             String url = intent.getStringExtra("LINK");
+
             // HTMLのドキュメントを取得
             org.jsoup.nodes.Document document = Jsoup.connect(url).get();
 
@@ -77,69 +76,114 @@ public class ItemDetailActivity extends Activity {
                     org.jsoup.nodes.Document document1 = Jsoup.connect(url1).get();
                     Elements links1 = null;
                     links1 = document1.getElementsByTag("p");  		//タグ"p"の要素を格納
+                    String detailtext1 = "";
                     for (org.jsoup.nodes.Element link1 : links1) {
                         String clas1 = link1.attr("class");			//属性"class"の属性値を取得
-                        if(clas1.equals("ynDetailText") || clas1.equals("newsBody")){			//取得した属性値が"ynDetailText"と一致
-                            String detailtext1 = link1.getElementsByAttribute("class").text();
+                        if (clas1.equals("ynDetailText") || clas1.equals("newsBody") || clas1.equals("yjS ymuiDate")) {            //取得した属性値が"ynDetailText"と一致
+                            String str = link1.getElementsByAttribute("class").text();
+
+                            String[] detailtext = str.split("。", 0);
+                            for (String text : detailtext) {
+                                detailtext1 += text + "。" + crlf + crlf;
+                            }
+
                             TextView mDetailtext = (TextView) findViewById(R.id.item_detail_text);
                             mDetailtext.setText(detailtext1);
                         }
                     }
                     Elements links2 = null;
                     links2 = document1.getElementsByTag("div");  		//タグ"p"の要素を格納
+                    String detailtext2 = "";
                     for (org.jsoup.nodes.Element link2 : links2) {
                         String clas2 = link2.attr("class");			//属性"class"の属性値を取得
-                        if(clas2.equals("marB10 clearFix yjMt") || clas2.equals("newsParagraph piL") || clas2.equals("rics-column bd covered")){
-                            String detailtext2 = link2.getElementsByAttribute("class").text();
+                        if(clas2.equals("marB10 clearFix yjMt") || clas2.equals("newsParagraph piL") || clas2.equals("rics-column bd covered") || clas2.equals("mainBody")){
+                            String str = link2.getElementsByAttribute("class").text();
+
+                            String[] detailtext = str.split("。", 0);
+                            for(String text: detailtext){
+                                detailtext2 += text + "。" + crlf + crlf;
+                            }
+
                             TextView mDetailtext = (TextView) findViewById(R.id.item_detail_text);
                             mDetailtext.setText(detailtext2);
                         }
                     }
+                    Elements links3 = null;
+                    links3 = document1.getElementsByTag("p");  		//タグ"p"の要素を格納
+                    for (org.jsoup.nodes.Element link3 : links3) {
+                        String clas3 = link3.attr("class");			//属性"class"の属性値を取得
+                        if (clas3.equals("ymuiDate") || clas3.equals("source") || clas3.equals("ynLastEditDate yjSt") || clas3.equals("ynLastEditDate yjS")) {
+                            String date = "\n"+link3.getElementsByAttribute("class").text()+"\n";
+                            TextView mDate = (TextView) findViewById(R.id.date);
+                            mDate.setText(date);
+                        }
+                    }
+
+                    String image_url = "";
+                    Elements links4 = document1.select("img[onContextMenu]");
+                    image_url = links4.attr("src");            //属性"class"の属性値を取得
+                    if(!image_url.isEmpty()) {
+                        //imageを取得
+                        final ImageView image = (ImageView) findViewById(R.id.imageView);
+                        //画像取得スレッド起動
+                        ImageGetTask task = new ImageGetTask(image);
+                        task.execute(image_url);
+
+                        image.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                ImageView imageView = new ImageView(ItemDetailActivity.this);
+                                Bitmap bitmap = ((BitmapDrawable)image.getDrawable()).getBitmap();
+                                imageView.setImageBitmap(bitmap);
+                                // ディスプレイの幅を取得する（API 13以上）
+                                Display display = getWindowManager().getDefaultDisplay();
+                                Point size = new Point();
+                                display.getSize(size);
+                                int width = size.x;
+
+                                float factor = width / bitmap.getWidth();
+                                imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+                                // ダイアログを作成する
+                                Dialog dialog = new Dialog(ItemDetailActivity.this);
+                                // タイトルを非表示にする
+                                dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+                                dialog.setContentView(imageView);
+                                dialog.getWindow().setLayout((int) (bitmap.getWidth() * factor), (int) (bitmap.getHeight() * factor));
+                                // ダイアログを表示する
+                                dialog.show();
+                            }
+                        });
+                    }
+
+                    /*Elements links4 = null;
+                    Elements links4_2 = null;
+                    links4 = document1.getElementsByTag("div");  		//タグ"p"の要素を格納
+                    for (org.jsoup.nodes.Element link4 : links4) {
+                        links4_2 = link4.getElementsByTag("img");
+                        System.out.println("links4_2：" + links4_2);
+                        for (org.jsoup.nodes.Element link4_2 : links4_2) {
+                                image_url = link4_2.attr("src");            //属性"class"の属性値を取得
+                                System.out.println("画像のURL：" + image_url);
+                                Toast.makeText(ItemDetailActivity.this, image_url, Toast.LENGTH_SHORT).show();
+                            if(!image_url.isEmpty()) {
+                                //imageを取得
+                                ImageView image = (ImageView) findViewById(R.id.imageView);
+                                //画像取得スレッド起動
+                                ImageGetTask task = new ImageGetTask(image);
+                                task.execute(image_url);
+                            }
+                        }
+                    }*/
+
+                    /*if(detailtext1.isEmpty()){
+                        Toast.makeText(ItemDetailActivity.this, "記事情報を取得できませんでした", Toast.LENGTH_SHORT).show();
+                    }*/
                 }
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e. printStackTrace();
         }
-
-        try {						//ファイルへ書き込み：count=-1(既読)にする
-            Title.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            BufferedReader br = new BufferedReader(new FileReader(Title));
-            try {
-                BufferedWriter pw = new BufferedWriter(new FileWriter(Title_w,true));
-                try {
-                    while((line = br.readLine()) != null){
-                        StringTokenizer tok = new StringTokenizer(line,"\t\t");
-                        title_line = tok.nextToken();
-                        count_line = Integer.parseInt(tok.nextToken());
-                        if(title.equals(title_line)){
-                            count = -1;
-                            pw.write(title_line+"\t\t"+count);
-                            pw.newLine();
-                        }else{
-                            pw.write(title_line+"\t\t"+count_line);
-                            pw.newLine();
-                        }
-                    }
-
-                    pw.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                br.close();
-                Title.delete();
-                Title_w.renameTo(Title);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
     }
 
     public boolean dispatchKeyEvent(KeyEvent event){
