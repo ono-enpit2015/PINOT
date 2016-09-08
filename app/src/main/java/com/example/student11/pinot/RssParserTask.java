@@ -245,10 +245,10 @@ public class RssParserTask extends AsyncTask<String, Integer, RssListAdapter> {
             case "Fri,":
                 week = "(金)";
                 break;
-            case "Sat,,":
+            case "Sat,":
                 week = "(土)";
                 break;
-            case "Sun,,":
+            case "Sun,":
                 week = "(日)";
                 break;
         }
