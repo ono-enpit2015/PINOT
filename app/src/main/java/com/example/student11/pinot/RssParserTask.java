@@ -39,7 +39,7 @@ public class RssParserTask extends AsyncTask<String, Integer, RssListAdapter> {
     final String SDFILE3 = LOGDIR + "tmp.txt";
     //final String SDFILE5 = LOGDIR + "tmp2.txt";
     final String SDFILE4 = LOGDIR + "all2.txt";
-    File DISPLAYED = new File(SDFILE1);       //前回表示した見出し文の一覧（表示回数が3回に達したものは除外）
+    File DISPLAYED = new File(SDFILE1);       //前回表示した見出し文の一覧
     File RECEIVED = new File(SDFILE2);    //アプリ起動時に受信した見出し文の一覧（DISPLAYと重複する見出し文有り）
     File TMP = new File(SDFILE3);    //新しく表示する見出し文の一覧を一時格納
     File ALL = new File(SDFILE4);

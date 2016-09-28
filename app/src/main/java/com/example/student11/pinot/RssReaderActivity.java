@@ -29,7 +29,7 @@ import java.util.StringTokenizer;
 //ListViewオブジェクトを既に含んだListActivityを使っているので,新たにListViewのインスタンスを生成して、アクティビティにセットする必要がない
 //setAdapter() ではなく setListAdapter() を使う
 public class RssReaderActivity extends ListActivity {
-    private static final String RSS_FEED_URL =  "http://www.rssmix.com/u/6589813/rss.xml"; //http://www.rssmix.com/u/6589813/rss.xml
+    private static final String RSS_FEED_URL =  "http://tshinobu.com/lab/get-multi-rss/?url=http%3A%2F%2Fnews.yahoo.co.jp%2Fpickup%2Frss.xml%0D%0Ahttp%3A%2F%2Fnews.yahoo.co.jp%2Fpickup%2Fworld%2Frss.xml%0D%0Ahttp%3A%2F%2Fnews.yahoo.co.jp%2Fpickup%2Fentertainment%2Frss.xml%0D%0Ahttp%3A%2F%2Fnews.yahoo.co.jp%2Fpickup%2Fcomputer%2Frss.xml%0D%0Ahttp%3A%2F%2Fnews.yahoo.co.jp%2Fpickup%2Flocal%2Frss.xml%0D%0Ahttp%3A%2F%2Fnews.yahoo.co.jp%2Fpickup%2Fdomestic%2Frss.xml%0D%0Ahttp%3A%2F%2Fnews.yahoo.co.jp%2Fpickup%2Feconomy%2Frss.xml%0D%0Ahttp%3A%2F%2Fnews.yahoo.co.jp%2Fpickup%2Fsports%2Frss.xml%0D%0Ahttp%3A%2F%2Fnews.yahoo.co.jp%2Fpickup%2Fscience%2Frss.xml&rss=RSS%E3%83%80%E3%82%A6%E3%83%B3%E3%83%AD%E3%83%BC%E3%83%89"; //http://www.rssmix.com/u/6589813/rss.xml or http://mix.chimpfeedr.com/9f2cd-yahoonews
     private ArrayList<Item> mItems;
     private RssListAdapter mAdapter;
     long start;
@@ -258,55 +258,6 @@ public class RssReaderActivity extends ListActivity {
             Log.e("視認件数",""+x);
             start = stop = RssParserTask.start = ItemDetailActivity.start = 0;
 
-            /*try {
-                Title.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                BufferedReader br = new BufferedReader(new FileReader(Title));
-                try {
-                    BufferedWriter pw = new BufferedWriter(new FileWriter(Title_w,true));
-                    PINOT_FILTER P = new PINOT_FILTER();
-                    try {
-                        while((line = br.readLine()) != null){
-                            StringTokenizer tok = new StringTokenizer(line,"\t\t");
-                            title_line = tok.nextToken();
-                            count_line = Integer.parseInt(tok.nextToken());
-                            if(count_line != -1){				//未読見出し文
-                                if(x>0){
-                                    count_line++;
-                                    pw.write(title_line+"\t\t"+count_line);
-                                    pw.newLine();
-                                    x--;
-                                }else{
-                                    pw.write(title_line+"\t\t"+count_line);
-                                    pw.newLine();
-                                }
-                                if(count_line >= 2){
-                                    P.Pinot_Filter(title_line,2);
-                                }
-                            }else{								//count_line=-1(既読見出し文)
-                                pw.write(title_line+"\t\t"+count_line);
-                                pw.newLine();
-                                x--;
-                            }
-
-                        }
-
-                        pw.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    br.close();
-                    Title.delete();
-                    Title_w.renameTo(Title);
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }*/
             viewcount();
             touchinfo();
             UPkousin();
